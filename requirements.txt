@@ -1,0 +1,4 @@
+rauth
+requests
+webob
+beaker

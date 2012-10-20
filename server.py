@@ -29,15 +29,26 @@ def oauth_callback():
 def restricted():
     return "Restricted reached !"
 
-# set up beaker sessions 
-session_opts = {
-    'session.type': 'file',
-    'session.cookie_expires': 300,
-    'session.data_dir': './data',
-    'session.auto': True
-}
-oauth_app = OAuthMiddleware(bottle.app())
-app = SessionMiddleware(oauth_app, session_opts)
-#app = bottle.app()
-run(app=app, host='localhost', port=8080, debug=True)
+def main(): 
+    if len(sys.argv) != 5:
+        print "Usage:", sys.argv[0],"client_id client_secret api_url callback_url"
+        sys.exit(1)
 
+    client_id = sys.argv[1]
+    client_secret = sys.argv[2]
+    api_url = sys.argv[3]
+    callback_url = sys.argv[4]
+
+    # set up beaker sessions 
+    session_opts = {
+        'session.type': 'file',
+        'session.cookie_expires': 300,
+        'session.data_dir': './data',
+        'session.auto': True
+    }
+    oauth_app = OAuthMiddleware(bottle.app())
+    app = SessionMiddleware(oauth_app, session_opts)
+    run(app=app, host='localhost', port=8080, debug=True)
+
+if __name__=="__main__":
+    main() 

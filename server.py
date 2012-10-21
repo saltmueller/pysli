@@ -3,7 +3,8 @@ from bottle import static_file
 from middleware import OAuthMiddleware
 from beaker.middleware import SessionMiddleware
 
-import bottle 
+import bottle
+import sys 
 
 class OAuth(object):
     def __init__(self):
@@ -25,7 +26,6 @@ def oauth_callback():
     return "Callback "
 
 @route('/restricted')
-@auth
 def restricted():
     return "Restricted reached !"
 
@@ -46,7 +46,7 @@ def main():
         'session.data_dir': './data',
         'session.auto': True
     }
-    oauth_app = OAuthMiddleware(bottle.app())
+    oauth_app = OAuthMiddleware(bottle.app(), client_id, client_secret, api_url, callback_url)
     app = SessionMiddleware(oauth_app, session_opts)
     run(app=app, host='localhost', port=8080, debug=True)
 

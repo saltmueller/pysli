@@ -1,7 +1,9 @@
 from rauth.service import OAuth2Service
 from rauth.service import Request, Response
+from urlparse import urlparse
 
 import copy
+import os 
 import requests
 
 class ExtendedRequest(Request):
@@ -19,7 +21,7 @@ class SLIClient(ExtendedRequest):
     API_AUTHORIZE_PATH = '/api/oauth/authorize'
     API_PATH_PREFIX = "/api/rest/v1/"
 
-    def __init__(self, client_id, client_secret, api_uri, callback_uri):
+    def __init__(self, client_id, client_secret, api_uri, callback_uri, access_token=None):
         self.client_id = client_id
         self.client_secret = client_secret
         self.api_uri = api_uri.rstrip("/")
@@ -27,7 +29,7 @@ class SLIClient(ExtendedRequest):
         self.access_token_uri = self.api_uri + self.API_ACCESS_TOKEN_PATH
         self.authorize_uri = self.api_uri + self.API_AUTHORIZE_PATH
         self.callback_uri = callback_uri
-        self.access_token = None 
+        self.access_token = access_token
         self.oauth_service = OAuth2Service(
                        name='sli-oauth-client',
                        consumer_key = client_id, 
@@ -43,7 +45,7 @@ class SLIClient(ExtendedRequest):
         data = dict(code=code,
                    grant_type='authorization_code',
                    redirect_uri=self.callback_uri)
-        
+                           
         resp = self.oauth_service.get_access_token('POST', data=data)
         self.access_token = resp.content[u'access_token']
 
@@ -70,9 +72,12 @@ class SLIClient(ExtendedRequest):
             headers["authorization"] = "bearer %s" % self.access_token
             use_kwargs["headers"] = headers
 
-        if self.access_token and (('params' not in kwargs) or ('access_token' not in kw_args['params'])): 
-            use_kwargs.setdefault('params', {})['access_token'] = self.access_token
-
         use_kwargs['timeout'] = use_kwargs.get('timeout', 300)
         response = self.session.request(method, url, **use_kwargs)
         return Response(response)
+
+
+def extract_id(response):
+    location = response.headers['location']
+    path = urlparse(location).path 
+    return os.path.split(path)[1]

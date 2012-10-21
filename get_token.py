@@ -24,7 +24,10 @@ def get_access_token(client_id, client_secret, api_url, callback_url):
         print "Unable to perform session check. Status code: %s" % r_2.response.status_code
         sys.exit(1)
 
-    # print out the auth token 
+    # r_3 = client.get("https://api.sandbox.slcedu.org/api/rest/v1/teachers")
+    # print r_3.content 
+    # return client.get_access_token() 
+
     return client.get_access_token()
 
 def main():

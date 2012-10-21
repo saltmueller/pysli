@@ -45,6 +45,11 @@ def main():
         new_id = extract_id(q.response)
         print "ID of newly created item:" + new_id 
 
+    student_ids = [s['id'] for s in client.get('students').content]
+    first = student_ids[0]
+    import pdb; pdb.set_trace() 
+    gb = client.get('students/' + first + '/reportCards')
+
 
 if __name__=="__main__":
     main() 

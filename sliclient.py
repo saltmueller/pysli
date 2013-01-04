@@ -45,7 +45,6 @@ class SLIClient(ExtendedRequest):
         data = dict(code=code,
                    grant_type='authorization_code',
                    redirect_uri=self.callback_uri)
-                           
         resp = self.oauth_service.get_access_token('POST', data=data)
         self.access_token = resp.content[u'access_token']
 
